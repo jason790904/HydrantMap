@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">水源地圖</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="title_activity_main2">Main2Activity</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="sheet_ID">1RimtIxA-C6KmI6AKrwoC-BY62o3gxMNOZVnJuFOcJjM</string>
+    <string name="title_investgation_result">調查結果</string>
+    <string name="title_investgation">水源調查</string>
+    <string name="title_query">查詢</string>
+    <string name="title_query_result">查詢結果</string>
+    <string name="title_activity_manual">ManualActivity</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+    <string name="apk_release_url">https://drive.google.com/open?id=1tEvjp2vCoixurxzYHeSl-1TdjlncsnJD</string>
+    <string name="apk_debug_url">https://drive.google.com/open?id=0Bydy_J0SLuP5bnhCWjY2QVFZNmM</string>
+</resources>

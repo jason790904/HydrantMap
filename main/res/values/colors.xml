@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#f42331</color>
+    <color name="colorPrimaryDark">#ca111d</color>
+    <color name="colorAccent">#257af1</color>
+    <color name="colorGrayBlack">#252525</color>
+    <color name="colorStateGood">#65f23a</color>
+    <color name="colorStateWarning">#fadd00</color>
+    <color name="colorStateBroken">#9FA0A0</color>
+    <color name="good_red">#d2181f</color>
+    <color name="good_red_dark">#ac080e</color>
+    <color name="nomal_green">#7bf120</color>
+    <color name="good_green">#3ec116</color>
+    <color name="dangerOrange">#ff6f00</color>
+
+</resources>

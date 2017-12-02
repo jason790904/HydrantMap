@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_investigation"
+            android:icon="@drawable/ic_menu_myplaces"
+            android:iconTintMode="screen"
+            android:title="水源調查" />
+        <item
+            android:id="@+id/nav_history"
+            android:icon="@drawable/ic_menu_recent_history"
+            android:iconTintMode="screen"
+            android:title="更新歷史" />
+        <item
+            android:id="@+id/nav_search"
+            android:icon="@drawable/ic_search_category_default"
+            android:iconTintMode="screen"
+            android:title="查詢水源" />
+        <item
+            android:id="@+id/nav_add_hydrant"
+            android:icon="@drawable/add_hydrant_icon"
+            android:title="新增消防栓"/>
+    </group>
+
+
+</menu>

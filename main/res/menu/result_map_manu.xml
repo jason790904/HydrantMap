@@ -1,0 +1,12 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.renai.firedepartment.keelong.hydrantmap.MainActivity">
+
+    <item
+        android:id="@+id/action_list"
+        android:icon="@drawable/ic_list"
+        android:orderInCategory="90"
+        android:title="list"
+        app:showAsAction="always" />
+</menu>
