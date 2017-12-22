@@ -140,6 +140,8 @@ public class MainActivity extends AppCompatActivity
     ImageButton clearButton;
     EditText placeAutoInput;
     ImageView scanImage;
+    ImageButton scanNearButton;
+
 
     Marker targetPosition;
 
@@ -176,8 +178,8 @@ public class MainActivity extends AppCompatActivity
         }
 
 
-        final ImageButton fab = (ImageButton) findViewById(R.id.fab2);
-        fab.setOnClickListener(new View.OnClickListener() {
+        scanNearButton = (ImageButton) findViewById(R.id.fab2);
+        scanNearButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 /*AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
@@ -275,6 +277,8 @@ public class MainActivity extends AppCompatActivity
         }*/
 
 
+
+
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -294,7 +298,9 @@ public class MainActivity extends AppCompatActivity
         mFusedLocationClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
             @Override
             public void onSuccess(Location location) {
-                ;
+                if(location==null)
+                    return;
+
                 resetCurrentBound(new LatLng(location.getLatitude(),location.getLongitude()));
 
                 mMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(new LatLng(location.getLatitude(), location.getLongitude()), 18, 0, 0)));
@@ -325,6 +331,8 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void onSuccess(Location location) {
 
+                        if(location==null)
+                            return;
                         mMap.animateCamera(CameraUpdateFactory.newLatLng(new LatLng(location.getLatitude(), location.getLongitude())));
                     }
                 });
@@ -359,10 +367,15 @@ public class MainActivity extends AppCompatActivity
                 btnDirect.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Uri gmmIntentUri = Uri.parse("google.navigation:q="+marker.getPosition().latitude+","+marker.getPosition().longitude+"&mode=w");
-                        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-                        mapIntent.setPackage("com.google.android.apps.maps");
-                        startActivity(mapIntent);
+                        try {
+                            Uri gmmIntentUri = Uri.parse("google.navigation:q=" + marker.getPosition().latitude + "," + marker.getPosition().longitude + "&mode=d");
+                            Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+                            mapIntent.setPackage("com.google.android.apps.maps");
+                            startActivity(mapIntent);
+                        }catch (Exception e){
+                            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                            builder.setTitle("錯誤").setMessage("無法開啟導航，可能是您的手機上未安裝「Google地圖」App。\n請至Play商店下載。").setPositiveButton("了解",null).show();
+                        }
                     }
                 });
 
@@ -491,11 +504,16 @@ public class MainActivity extends AppCompatActivity
 
                     return;
                 }
-                Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE,"zh-TW");
-                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-                intent.putExtra(RecognizerIntent.EXTRA_PROMPT,"請說出目的地");
-                startActivityForResult(intent,REQUEST_SPEECH_RECOGNIZE);
+                try {
+                    Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+                    intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "zh-TW");
+                    intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+                    intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "請說出目的地");
+                    startActivityForResult(intent, REQUEST_SPEECH_RECOGNIZE);
+                }catch (Exception e){
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                    builder.setTitle("錯誤").setMessage("無法開啟語音服務，可能是您的手機上未安裝「Google App」。\n請至Play商店下載。").setPositiveButton("了解",null).show();
+                }
             }
         });
 
@@ -604,14 +622,19 @@ public class MainActivity extends AppCompatActivity
 
             return true;
         }else if(id==R.id.action_about){
-            String messge;
-            try {
-                messge = "應用程式版本:" + getApplicationContext().getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
-            }catch (PackageManager.NameNotFoundException e){
-                messge = e.getMessage()+TextUtils.join("\n",e.getStackTrace());
-            }
+            View aboutContent = LayoutInflater.from(this).inflate(R.layout.application_about,null);
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("關於").setMessage(messge).setPositiveButton("關閉",null).show();
+
+            try {
+                ((TextView)aboutContent.findViewById(R.id.about_content)).setText(getString(R.string.about_app));
+                ((TextView)aboutContent.findViewById(R.id.about_version)).setText( getApplicationContext().getPackageManager().getPackageInfo(getPackageName(), 0).versionName);
+                builder.setTitle("關於").setView(aboutContent).setPositiveButton("關閉",null).show();
+
+            }catch (PackageManager.NameNotFoundException e){
+                String messge = e.getMessage()+TextUtils.join("\n",e.getStackTrace());
+                builder.setTitle("關於").setMessage(messge).setPositiveButton("關閉",null).show();
+
+            }
         }
 
         return super.onOptionsItemSelected(item);
@@ -741,7 +764,17 @@ public class MainActivity extends AppCompatActivity
             case REQUEST_PLACE_AUTOCOMPLETE:
                 if(resultCode == RESULT_OK){
                     Place place = PlaceAutocomplete.getPlace(this,data);
-                    mMap.animateCamera(CameraUpdateFactory.newLatLng(place.getLatLng()));
+                    mMap.animateCamera(CameraUpdateFactory.newLatLng(place.getLatLng()), new GoogleMap.CancelableCallback() {
+                        @Override
+                        public void onFinish() {
+                            scanNearButton.callOnClick();
+                        }
+
+                        @Override
+                        public void onCancel() {
+
+                        }
+                    });
                     if(targetPosition!=null){
                         targetPosition.remove();
                         targetPosition = null;
@@ -845,7 +878,7 @@ public class MainActivity extends AppCompatActivity
         if(progressDialog == null){
             progressDialog = new ProgressDialog(this);
             progressDialog.setTitle("檢查更新");
-            progressDialog.setMessage("正在更新資料庫...\n第一次更新可能會花比較多時間，請耐心等候");
+            progressDialog.setMessage("伺服器連線中");
             progressDialog.setCancelable(false);
         }
 
@@ -975,6 +1008,8 @@ public class MainActivity extends AppCompatActivity
         @Override
         protected Integer doInBackground(Void... params) {
 
+
+
             HttpTransport transport = AndroidHttp.newCompatibleTransport();
             JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
             GoogleSheetConnecter gsc = new GoogleSheetConnecter(mCredential,transport,jsonFactory);
@@ -1070,28 +1105,46 @@ public class MainActivity extends AppCompatActivity
                 String messege = output.getValues().get(0).get(0).toString();
                 if (messege.compareTo("") != 0) {
                     progressDialog.cancel();
+                    final int cmdCode;
+                    if(output.getValues().size()>1) {
+                        cmdCode = Integer.valueOf(output.getValues().get(1).get(0).toString());
+                    }else{
+                        cmdCode = GoogleSheetConnecter.CMD_CODE_NORMAL ;
+                    }
                     dialog.setTitle("公告").setMessage(messege).setCancelable(false).setPositiveButton("確認", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            if (progressDialog == null) {
-                                progressDialog = new ProgressDialog(MainActivity.this);
-                                progressDialog.setTitle("檢查更新");
-                                progressDialog.setMessage("正在更新資料庫...\n第一次更新可能會花比較多時間，請耐心等候");
-                                progressDialog.setCancelable(false);
+                            switch (cmdCode){
+                                case GoogleSheetConnecter.CMD_CODE_END_APPLICATION:
+                                    android.os.Process.killProcess(android.os.Process.myPid());
+                                    break;
+                                default:
+                                    if (progressDialog == null) {
+                                        progressDialog = new ProgressDialog(MainActivity.this);
+                                        progressDialog.setTitle("檢查更新");
+                                        progressDialog.setMessage("確認程式是否有更新");
+                                        progressDialog.setCancelable(false);
+                                    }else {
+                                        progressDialog.setTitle("檢查更新");
+                                        progressDialog.setMessage("確認程式是否有更新");
+                                    }
+
+                                    if (hasPermission() && !progressDialog.isShowing()) {
+
+                                        progressDialog.show();
+
+
+                                        new checkApplicationVersion().execute();
+                                        //new checkApplicationUpdate().execute();
+                                    }
                             }
-
-                            if (hasPermission() && !progressDialog.isShowing()) {
-
-                                progressDialog.show();
-
-
-                                new checkApplicationVersion().execute();
-                                //new checkApplicationUpdate().execute();
-                            }
-
                         }
                     }).show();
                 } else {
+                    if(progressDialog!=null){
+                        progressDialog.setTitle("檢查更新");
+                        progressDialog.setMessage("確認程式是否有更新");
+                    }
                     new checkApplicationVersion().execute();
                 }
             }else {
@@ -1182,10 +1235,15 @@ public class MainActivity extends AppCompatActivity
                     public void onClick(DialogInterface dialog, int which) {
                         if (progressDialog == null) {
                             progressDialog = new ProgressDialog(MainActivity.this);
-                            progressDialog.setTitle("檢查更新");
-                            progressDialog.setMessage("正在更新資料庫...\n第一次更新可能會花比較多時間，請耐心等候");
+                            progressDialog.setTitle("資料下載中");
+                            progressDialog.setMessage("可能需花費較多時間，請耐心等候....");
                             progressDialog.setCancelable(false);
+                        }else {
+                            progressDialog.setTitle("資料下載中");
+                            progressDialog.setMessage("可能需花費較多時間，請耐心等候....");
                         }
+
+
                          if (hasPermission() && !progressDialog.isShowing()) {
                              progressDialog.show();
 
@@ -1205,6 +1263,15 @@ public class MainActivity extends AppCompatActivity
 
 
                 return;
+            }
+            if (progressDialog == null) {
+                progressDialog = new ProgressDialog(MainActivity.this);
+                progressDialog.setTitle("資料下載中");
+                progressDialog.setMessage("可能需花費較多時間，請耐心等候....");
+                progressDialog.setCancelable(false);
+            }else {
+                progressDialog.setTitle("資料下載中");
+                progressDialog.setMessage("可能需花費較多時間，請耐心等候....");
             }
             new checkUpdate().execute();
 

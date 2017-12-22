@@ -64,10 +64,14 @@ public class GoogleSheetConnecter {
 
     public static final int TOTAL_COLUMN_COUNT=13;
 
-    public static  final String RANGE_SERVER_MESSEGE = TABLE_LOG+"!C1";
+    public static  final String RANGE_SERVER_MESSEGE = TABLE_LOG+"!C1:C2";
     public static final String RANGE_VERSION = TABLE_LOG+"!D1";
     public static final String COLUMN_VERSION_CODE = "D";
     public static final String COLUMN_VERSION_CHANGELOG = "F";
+
+    public static final int CMD_CODE_END_APPLICATION = -1;
+    public static final int CMD_CODE_NORMAL = 0;
+
 
 
     GoogleSheetConnecter(GoogleAccountCredential credential,HttpTransport transport, JsonFactory jsonFactory) {

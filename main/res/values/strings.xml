@@ -15,4 +15,10 @@
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="apk_release_url">https://drive.google.com/open?id=1tEvjp2vCoixurxzYHeSl-1TdjlncsnJD</string>
     <string name="apk_debug_url">https://drive.google.com/open?id=0Bydy_J0SLuP5bnhCWjY2QVFZNmM</string>
+    <string name="about_app">
+        \t\t\t此App主要功能可以將消防栓水源的\n狀態、路寬、地理位置等即時資訊，\n同步到雲端、隨時查看以利救災之用，\n
+        並且提供新增、修改功能確保平日維護工作，\n查詢功能可以幫助製作特定條件的報表，請善加利用。
+    </string>
+    <string name="app_author">仁愛分隊175梯次役男 褚耀升</string>
+    <string name="author_email">jasonhillwk@gmail.com</string>
 </resources>
