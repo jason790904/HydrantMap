@@ -43,7 +43,7 @@ import java.util.List;
 public class GoogleSheetConnecter {
     private com.google.api.services.sheets.v4.Sheets mService = null;
 
-    public static final String SHEET_ID= "1RimtIxA-C6KmI6AKrwoC-BY62o3gxMNOZVnJuFOcJjM";
+    public static final String SHEET_ID= your_sheet_id;
 
     public static final String TABLE_HYDRANT="hydrant";
     public static final String TABLE_LOG = "log";
